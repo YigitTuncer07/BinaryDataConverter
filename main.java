@@ -4,7 +4,9 @@ import java.util.Scanner;
 
 class Main{
 
+    //big -> 0; little -> 1
     public static byte endianType;
+    //int -> 0; unsigned -> 1; float -> 2
     public static byte dataType;
     public static byte size;
 
@@ -40,9 +42,9 @@ class Main{
         Scanner scanner = new Scanner(System.in);
         System.out.println("Byte Ordering: ");
         tempString = scanner.nextLine();
-        if (tempString.equals("Big Endian")){
+        if (tempString.equals("b")){
             endianType = 0;
-        } else if (tempString.equals("Little Endian")){
+        } else if (tempString.equals("l")){
             endianType = 1;
         } else {
             System.out.println("Unkown Input");
@@ -53,11 +55,11 @@ class Main{
         //Gets data type
         System.out.println("Data Type: ");
         tempString = scanner.nextLine();
-        if (tempString.equals("Signed Integer")) {
+        if (tempString.equals("int")) {
             dataType = 0;
-        } else if (tempString.equals("Unsigned Integer")){
+        } else if (tempString.equals("unsigned")){
             dataType = 1;
-        } else if (tempString.equals("Floating Point")){
+        } else if (tempString.equals("float")){
             dataType = 2;
         } else {
             System.out.println("Unkown Input");
@@ -80,7 +82,49 @@ class Main{
             System.out.println("Unkown Input");
             return;
         }        
+
+
+        String binaryNumbers[][] = new String[3][12/size];
+
+        switch (size) { 
+            case 1:
+            
+            for (i = 0; i < 3; i++){
+                for (int j = 0; j < 12; j++){
+                    binaryNumbers[i][j] = shortToBinary(hexArray[i][j]);
+                }
+            }
+            print2DArray(binaryNumbers);
+
+            break;
+
+            case 2:
+
+            for (i = 0; i < 3; i++){
+                for (int j = 0; j < 12; j += 2){
+                    //big
+                    if(endianType == 0) {
+                        binaryNumbers[i][j/2] = shortToBinary(hexArray[i][j]) + shortToBinary(hexArray[i][j + 1]);
+                    } else { //little
+                        binaryNumbers[i][j/2] = shortToBinary(hexArray[i][j + 1]) + shortToBinary(hexArray[i][j]);
+                    }
+                }
+            }
+            print2DArray(binaryNumbers);
+            break;
+
+        }
     }
+
+    public static String shortToBinary(short input) {
+        String binary = "";
+        for (int i = 7; i >= 0; i--) {
+            binary += (input >> i) & 1;
+        }
+        return binary;
+    }
+    
+    
 
 
     //Convers a 2 byte hexadecimal into a decimal
@@ -122,5 +166,15 @@ class Main{
             System.out.println();
         }
     }
+
+    public static void print2DArray(String[][] array) {
+        for (int i = 0; i < array.length; i++) {
+            for (int j = 0; j < array[i].length; j++) {
+                System.out.print(array[i][j] + " ");
+            }
+            System.out.println();
+        }
+    }
+    
     
 }
