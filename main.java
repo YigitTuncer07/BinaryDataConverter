@@ -13,32 +13,34 @@ class Main {
     public static void main(String[] args) {
 
         // Take file input
-        File file = new File("./input.txt");
+        Scanner scanner = new Scanner(System.in);
+        System.out.println("File Name:\n");
+        String fileName= scanner.nextLine();
+        File file = new File(fileName);
 
-        // Takes hexadecimals from input and puts them into hexArray
-        short[][] hexArray = new short[3][12];
+        // Takes hexadecimals from input and puts them into decArray
+        short[][] decArray = new short[3][12];
         short i = 0;
         String tempString;
         String[] tempStrings;
         try {
-            Scanner scanner = new Scanner(file);
-            while (scanner.hasNext()) {
-                tempString = scanner.nextLine();
+            Scanner scanner1 = new Scanner(file);
+            while (scanner1.hasNext()) {
+                tempString = scanner1.nextLine();
                 tempStrings = tempString.split(" ");
                 for (int j = 0; j < 12; j++) {
-                    hexArray[i][j] = convertHexToShort(tempStrings[j]);
+                    decArray[i][j] = convertHexToShort(tempStrings[j]);
                 }
                 i++;
             }
-            scanner.close();
+            scanner1.close();
         } catch (FileNotFoundException e) {
             System.out.println("FILENOTFOUND");
+            scanner.close();
             return;
         }
-        // Gets other inputs
-
+        
         // Gets byte ordering
-        Scanner scanner = new Scanner(System.in);
         System.out.println("Byte Ordering: ");
         tempString = scanner.nextLine();
         if (tempString.equals("b")) {
@@ -47,6 +49,7 @@ class Main {
             endianType = 1;
         } else {
             System.out.println("Unkown Input");
+            scanner.close();
             return;
         }
 
@@ -61,12 +64,14 @@ class Main {
             dataType = 2;
         } else {
             System.out.println("Unkown Input");
+            scanner.close();
             return;
         }
 
         // Gets Byte Size
         System.out.println("Byte Size: ");
         tempString = scanner.next();
+        scanner.close();
         if (tempString.equals("1")) {
             size = 1;
         } else if (tempString.equals("2")) {
@@ -87,12 +92,12 @@ class Main {
             case 1:
                 for (i = 0; i < 3; i++) {
                     for (int j = 0; j < 12; j++) {
-                        binaryNumbers[i][j] = convertShortToBinary(hexArray[i][j]);
+                        binaryNumbers[i][j] = convertShortToBinary(decArray[i][j]);
                     }
                 }
 
                 if (dataType == 1) {// For unsigned
-                    printShortArray2D(hexArray);
+                    printShortArray2D(decArray);
                 } else if (dataType == 0) {// For Signed
 
                 } else {// For float
@@ -108,11 +113,11 @@ class Main {
                     for (int j = 0; j < 12; j += 2) {
                         // big
                         if (endianType == 0) {
-                            binaryNumbers[i][j / 2] = convertShortToBinary(hexArray[i][j])
-                                    + convertShortToBinary(hexArray[i][j + 1]);
+                            binaryNumbers[i][j / 2] = convertShortToBinary(decArray[i][j])
+                                    + convertShortToBinary(decArray[i][j + 1]);
                         } else { // little
-                            binaryNumbers[i][j / 2] = convertShortToBinary(hexArray[i][j + 1])
-                                    + convertShortToBinary(hexArray[i][j]);
+                            binaryNumbers[i][j / 2] = convertShortToBinary(decArray[i][j + 1])
+                                    + convertShortToBinary(decArray[i][j]);
                         }
                     }
                 }
@@ -135,12 +140,12 @@ class Main {
                     for (int j = 0; j < 12; j += 3) {
 
                         if (endianType == 0) {
-                            binaryNumbers[i][j / 3] = convertShortToBinary(hexArray[i][j])
-                                    + convertShortToBinary(hexArray[i][j + 1])
-                                    + convertShortToBinary(hexArray[i][j + 2]);
+                            binaryNumbers[i][j / 3] = convertShortToBinary(decArray[i][j])
+                                    + convertShortToBinary(decArray[i][j + 1])
+                                    + convertShortToBinary(decArray[i][j + 2]);
                         } else {
-                            binaryNumbers[i][j / 3] = convertShortToBinary(hexArray[i][j + 2])
-                                    + convertShortToBinary(hexArray[i][j + 1]) + convertShortToBinary(hexArray[i][j]);
+                            binaryNumbers[i][j / 3] = convertShortToBinary(decArray[i][j + 2])
+                                    + convertShortToBinary(decArray[i][j + 1]) + convertShortToBinary(decArray[i][j]);
 
                         }
                     }
@@ -168,15 +173,15 @@ class Main {
                     for (int j = 0; j < 12; j += 4) {
 
                         if (endianType == 0) {
-                            binaryNumbers[i][j / 4] = convertShortToBinary(hexArray[i][j])
-                                    + convertShortToBinary(hexArray[i][j + 1])
-                                    + convertShortToBinary(hexArray[i][j + 2])
-                                    + convertShortToBinary(hexArray[i][j + 3]);
+                            binaryNumbers[i][j / 4] = convertShortToBinary(decArray[i][j])
+                                    + convertShortToBinary(decArray[i][j + 1])
+                                    + convertShortToBinary(decArray[i][j + 2])
+                                    + convertShortToBinary(decArray[i][j + 3]);
                         } else {
-                            binaryNumbers[i][j / 4] = convertShortToBinary(hexArray[i][j + 3])
-                                    + convertShortToBinary(hexArray[i][j + 2])
-                                    + convertShortToBinary(hexArray[i][j + 1])
-                                    + convertShortToBinary(hexArray[i][j]);
+                            binaryNumbers[i][j / 4] = convertShortToBinary(decArray[i][j + 3])
+                                    + convertShortToBinary(decArray[i][j + 2])
+                                    + convertShortToBinary(decArray[i][j + 1])
+                                    + convertShortToBinary(decArray[i][j]);
 
                         }
                     }
