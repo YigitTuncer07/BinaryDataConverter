@@ -106,15 +106,19 @@ class Main {
                 }
 
                 if (dataType == 1) {// For unsigned
-                    
+
                     for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
-                            results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
+                            results[i][j] = convertBinaryToUnsignedLong(binaryNumbers[i][j]);
                         }
                     }
 
                 } else if (dataType == 0) {// For Signed
-
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            results[i][j] = convertBinaryToSignedLong(binaryNumbers[i][j]);
+                        }
+                    }
                 } else {// For float
 
                 }
@@ -140,11 +144,15 @@ class Main {
                 if (dataType == 1) {// If it is unsigned
                     for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
-                            results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
+                            results[i][j] = convertBinaryToUnsignedLong(binaryNumbers[i][j]);
                         }
                     }
                 } else if (dataType == 0) {//For Signed
-
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            results[i][j] = convertBinaryToSignedLong(binaryNumbers[i][j]);
+                        }
+                    }
                 } else {//For Float
 
                 }
@@ -171,11 +179,16 @@ class Main {
                 if (dataType == 1) {// For unsigned
                     for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
-                            results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
+                            results[i][j] = convertBinaryToUnsignedLong(binaryNumbers[i][j]);
                         }
                     }
 
                 } else if (dataType == 0) {// For Signed
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            results[i][j] = convertBinaryToSignedLong(binaryNumbers[i][j]);
+                        }
+                    }
 
                 } else {// For float
 
@@ -207,11 +220,16 @@ class Main {
                 if (dataType == 1) {// For unsigned
                     for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
-                            results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
+                            results[i][j] = convertBinaryToUnsignedLong(binaryNumbers[i][j]);
                         }
                     }
 
                 } else if (dataType == 0) {// For Signed
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            results[i][j] = convertBinaryToSignedLong(binaryNumbers[i][j]);
+                        }
+                    }
 
                 } else {// For float
 
@@ -232,8 +250,8 @@ class Main {
         return binary;
     }
 
-    public static long convertBinaryToLong(String binaryString) {
-        int decimalValue = 0;
+    public static long convertBinaryToUnsignedLong(String binaryString) {
+        long decimalValue = 0;
         int power = 0;
         for (int i = binaryString.length() - 1; i >= 0; i--) {
             char binaryDigit = binaryString.charAt(i);
@@ -244,6 +262,28 @@ class Main {
         }
         return decimalValue;
     }
+
+    public static long convertBinaryToSignedLong(String binary) {
+        long result = 0;
+        int mult = (int) (Math.pow(2, binary.length() - 1));
+
+        for (int i = 0; i < binary.length(); i++) {
+            if (i == 0) {
+                if (binary.charAt(0) == '1') {
+                    result = result - mult;
+                }
+            } else {
+                if (binary.charAt(i) == '1') {
+                    result = result + mult;
+                }
+            }
+
+            mult = mult / 2;
+
+        }
+        return result;
+    }
+
 
     // Convers a 2 byte hexadecimal into a decimal
     // For example 1a into 170
@@ -314,27 +354,6 @@ class Main {
             power++;
         }
         return decimalValue;
-    }
-
-    public static int binaryToSignedInteger(String binary) {
-        int result = 0;
-        int mult = (int) (Math.pow(2, binary.length() - 1));
-
-        for (int i = 0; i < binary.length(); i++) {
-            if (i == 0) {
-                if (binary.charAt(0) == '1') {
-                    result = result - mult;
-                }
-            } else {
-                if (binary.charAt(i) == '1') {
-                    result = result + mult;
-                }
-            }
-
-            mult = mult / 2;
-
-        }
-        return result;
     }
 
     public static int getFileLengthY(File file) throws IOException {
