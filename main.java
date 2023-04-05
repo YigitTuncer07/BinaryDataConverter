@@ -4,6 +4,8 @@ import java.util.Scanner;
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import java.io.PrintWriter;
+
 
 class Main {
 
@@ -240,6 +242,7 @@ class Main {
                 break;
 
         }
+        writeArrayToFile(results, "output.txt");
     }
 
     public static String convertShortToBinary(short input) {
@@ -264,26 +267,34 @@ class Main {
     }
 
     public static long convertBinaryToSignedLong(String binary) {
-        long result = 0;
-        int mult = (int) (Math.pow(2, binary.length() - 1));
-
-        for (int i = 0; i < binary.length(); i++) {
-            if (i == 0) {
-                if (binary.charAt(0) == '1') {
-                    result = result - mult;
-                }
-            } else {
-                if (binary.charAt(i) == '1') {
-                    result = result + mult;
-                }
+        int length = binary.length();
+        if (binary.charAt(0) == '1') { // if the number is negative
+            // invert all the bits
+            String inverted = "";
+            for (int i = 0; i < length; i++) {
+                inverted += (binary.charAt(i) == '0') ? '1' : '0';
             }
-
-            mult = mult / 2;
-
+            // add 1 to the inverted number
+            long value = convertBinaryToUnsignedLong(inverted) + 1;
+            // negate the value to get the 2's complement
+            return -value;
+        } else { // if the number is non-negative
+            return convertBinaryToUnsignedLong(binary);
         }
-        return result;
     }
 
+    public static int convertBinaryToInteger(String binaryString) {
+        int decimalValue = 0;
+        int power = 0;
+        for (int i = binaryString.length() - 1; i >= 0; i--) {
+            char binaryDigit = binaryString.charAt(i);
+            if (binaryDigit == '1') {
+                decimalValue += Math.pow(2, power);
+            }
+            power++;
+        }
+        return decimalValue;
+    }
 
     // Convers a 2 byte hexadecimal into a decimal
     // For example 1a into 170
@@ -343,17 +354,19 @@ class Main {
         }
     }
 
-    public static int convertBinaryToInteger(String binaryString) {
-        int decimalValue = 0;
-        int power = 0;
-        for (int i = binaryString.length() - 1; i >= 0; i--) {
-            char binaryDigit = binaryString.charAt(i);
-            if (binaryDigit == '1') {
-                decimalValue += Math.pow(2, power);
+    public static void writeArrayToFile(long[][] array, String filePath) {
+        try {
+            PrintWriter writer = new PrintWriter(new File(filePath));
+            for (int i = 0; i < array.length; i++) {
+                for (int j = 0; j < array[i].length; j++) {
+                    writer.print(array[i][j] + " ");
+                }
+                writer.println();
             }
-            power++;
+            writer.close();
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
         }
-        return decimalValue;
     }
 
     public static int getFileLengthY(File file) throws IOException {
