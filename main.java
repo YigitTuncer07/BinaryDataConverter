@@ -6,7 +6,6 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-
 class Main {
 
     // big -> 0; little -> 1
@@ -27,7 +26,8 @@ class Main {
         int fileLengthY = 0;
         try {
             fileLengthY = getFileLengthY(file);
-        } catch (IOException ignore) {}
+        } catch (IOException ignore) {
+        }
 
         // Takes hexadecimals from input and puts them into decArray
         short[][] decArray = new short[fileLengthY][12];
@@ -98,6 +98,9 @@ class Main {
 
         String binaryNumbers[][] = new String[fileLengthY][12 / size];
         long results[][] = new long[fileLengthY][12 / size];
+        String doubleResults[][] = new String[fileLengthY][12 / size];
+        int bias, exponent = 0;
+        double mantisa = 0;
 
         switch (size) {
             case 1:
@@ -122,10 +125,38 @@ class Main {
                         }
                     }
                 } else {// For float
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            // In this case sign = 1 exp = 4 mant = 3;
+                            String IEEE = binaryNumbers[i][j];
+                            String[] parts = new String[3];
+
+                            // Split the string into parts of length 1, 4, and 3
+                            parts[0] = IEEE.substring(0, 1);
+                            parts[1] = IEEE.substring(1, 5);
+                            parts[2] = IEEE.substring(5, 8);
+
+                            // Set Bias
+                            bias = 15;
+
+                            // Set Exponent
+                            exponent = convertBinaryToInteger(parts[1]) - bias;
+
+                            // Sets mantissa, no need to round as it is only 4 bits
+                            mantisa = convertBinaryToDouble(parts[2]);
+
+                            // Set Sign
+                            if (parts[0].equals("1")) {
+                                mantisa *= -1;
+                            }
+                            
+                            //Combine them
+                            doubleResults[i][j] = mantisa + "e" + exponent;
+                        }
+                    }
 
                 }
                 printStringArray2D(binaryNumbers);
-                printLongArray2D(results);
 
                 break;
 
@@ -149,17 +180,16 @@ class Main {
                             results[i][j] = convertBinaryToUnsignedLong(binaryNumbers[i][j]);
                         }
                     }
-                } else if (dataType == 0) {//For Signed
+                } else if (dataType == 0) {// For Signed
                     for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
                             results[i][j] = convertBinaryToSignedLong(binaryNumbers[i][j]);
                         }
                     }
-                } else {//For Float
+                } else {// For Float
 
                 }
                 printStringArray2D(binaryNumbers);
-                printLongArray2D(results);
                 break;
 
             case 3:
@@ -196,8 +226,6 @@ class Main {
 
                 }
                 printStringArray2D(binaryNumbers);
-                printLongArray2D(results);
-
                 break;
 
             case 4:
@@ -237,12 +265,15 @@ class Main {
 
                 }
                 printStringArray2D(binaryNumbers);
-                printLongArray2D(results);
-
                 break;
 
         }
-        writeArrayToFile(results, "output.txt");
+        if (dataType == 2) {
+            writeStringArrayToFile(doubleResults, "output.txt");
+        } else {
+            writeLongArrayToFile(results, "output.txt");
+
+        }
     }
 
     public static String convertShortToBinary(short input) {
@@ -251,6 +282,18 @@ class Main {
             binary += (input >> i) & 1;
         }
         return binary;
+    }
+
+    public static double convertBinaryToDouble(String binary) {
+        double result = 0;
+        for (int i = 0; i < binary.length(); i++) {
+            char bit = binary.charAt(i);
+            if (bit == '1') {
+                result += Math.pow(0.5, i + 1);
+            }
+        }
+        // Truncates to 5 digits after point
+        return Math.floor(result * 100000) / 100000;
     }
 
     public static long convertBinaryToUnsignedLong(String binaryString) {
@@ -354,7 +397,27 @@ class Main {
         }
     }
 
-    public static void writeArrayToFile(long[][] array, String filePath) {
+    public static void writeLongArrayToFile(long[][] array, String filePath) {
+        try {
+            PrintWriter writer = new PrintWriter(new File(filePath));
+            int i = 0;
+            int j = 0;
+            for (i = 0; i < array.length; i++) {
+                for (j = 0; j < array[i].length - 1; j++) {
+                    writer.print(array[i][j] + " ");
+                }
+                writer.print(array[i][j++]);
+                j = 0;
+                writer.println();
+            }
+            writer.close();
+        } catch (FileNotFoundException e) {
+            System.out.println("ERROR: OUTPUT FILE NOT FOUND");
+            return;
+        }
+    }
+
+    public static void writeStringArrayToFile(String[][] array, String filePath) {
         try {
             PrintWriter writer = new PrintWriter(new File(filePath));
             int i = 0;
