@@ -293,5 +293,28 @@ class Main {
         }
         return decimalValue;
     }
+    public static int binaryToSignedInteger(String binary) {
+        int result = 0;
+        int mult = (int)(Math.pow(2, binary.length()-1));
+        
+        for (int i = 0; i < binary.length(); i++) {
+            if(i == 0){
+                if(binary.charAt(0) == '1'){
+                    result = result - mult;
+                }
+            } else{
+                if(binary.charAt(i) == '1'){
+                    result= result + mult;
+                }
+            }
+
+            mult = mult/2;
+
+            
+            
+        }
+        return result; 
+    }
+    
 
 }
