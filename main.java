@@ -15,7 +15,7 @@ class Main {
         // Take file input
         Scanner scanner = new Scanner(System.in);
         System.out.println("File Name:\n");
-        String fileName= scanner.nextLine();
+        String fileName = scanner.nextLine();
         File file = new File(fileName);
 
         // Takes hexadecimals from input and puts them into decArray
@@ -39,7 +39,7 @@ class Main {
             scanner.close();
             return;
         }
-        
+
         // Gets byte ordering
         System.out.println("Byte Ordering: ");
         tempString = scanner.nextLine();
@@ -99,7 +99,11 @@ class Main {
                 if (dataType == 1) {// For unsigned
                     printShortArray2D(decArray);
                 } else if (dataType == 0) {// For Signed
-
+                    for (int m = 0; m < 3; m++) {
+                        for (int k = 0; k < 12; k++) {
+                            results[m][k] = binaryToSignedLong(binaryNumbers[m][k]);
+                        }
+                    }
                 } else {// For float
 
                 }
@@ -128,7 +132,13 @@ class Main {
                             results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
                         }
                     }
-                } else if (dataType == 0) {
+                } else if (dataType == 0) { // signed
+                    for (int m = 0; m < 3; m++) {
+                        for (int k = 0; k < 12 / size; k++) {
+                            results[m][k] = binaryToSignedLong(binaryNumbers[m][k]);
+                        }
+                    }
+                } else { // float
 
                 }
                 printStringArray2D(binaryNumbers);
@@ -159,7 +169,11 @@ class Main {
                     }
 
                 } else if (dataType == 0) {// For Signed
-
+                    for (int m = 0; m < 3; m++) {
+                        for (int k = 0; k < 12 / size; k++) {
+                            results[m][k] = binaryToSignedLong(binaryNumbers[m][k]);
+                        }
+                    }
                 } else {// For float
 
                 }
@@ -195,7 +209,11 @@ class Main {
                     }
 
                 } else if (dataType == 0) {// For Signed
-
+                    for (int m = 0; m < 3; m++) {
+                        for (int k = 0; k < 12 / size; k++) {
+                            results[m][k] = binaryToSignedLong(binaryNumbers[m][k]);
+                        }
+                    }
                 } else {// For float
 
                 }
@@ -298,28 +316,25 @@ class Main {
         }
         return decimalValue;
     }
-    public static int binaryToSignedInteger(String binary) {
-        int result = 0;
-        int mult = (int)(Math.pow(2, binary.length()-1));
-        
+    //Converts any length of binary strings to long.
+    public static long binaryToSignedLong(String binary) {
+        long result = 0;
+        long mult = (long) (Math.pow(2, binary.length() - 1));
+
         for (int i = 0; i < binary.length(); i++) {
-            if(i == 0){
-                if(binary.charAt(0) == '1'){
+            if (i == 0) {
+                if (binary.charAt(0) == '1') {
                     result = result - mult;
                 }
-            } else{
-                if(binary.charAt(i) == '1'){
-                    result= result + mult;
+            } else {
+                if (binary.charAt(i) == '1') {
+                    result = result + mult;
                 }
             }
 
-            mult = mult/2;
-
-            
-            
+            mult = mult / 2;
         }
-        return result; 
+        return result;
     }
-    
 
 }
