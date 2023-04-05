@@ -1,6 +1,9 @@
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 
 class Main {
 
@@ -14,12 +17,18 @@ class Main {
 
         // Take file input
         Scanner scanner = new Scanner(System.in);
-        System.out.println("File Name:\n");
-        String fileName= scanner.nextLine();
+        System.out.println("File Name:");
+        String fileName = scanner.nextLine();
         File file = new File(fileName);
 
+        // Get File Length
+        int fileLengthY = 0;
+        try {
+            fileLengthY = getFileLengthY(file);
+        } catch (IOException ignore) {}
+
         // Takes hexadecimals from input and puts them into decArray
-        short[][] decArray = new short[3][12];
+        short[][] decArray = new short[fileLengthY][12];
         short i = 0;
         String tempString;
         String[] tempStrings;
@@ -39,7 +48,7 @@ class Main {
             scanner.close();
             return;
         }
-        
+
         // Gets byte ordering
         System.out.println("Byte Ordering: ");
         tempString = scanner.nextLine();
@@ -85,19 +94,25 @@ class Main {
             return;
         }
 
-        String binaryNumbers[][] = new String[3][12 / size];
-        long results[][] = new long[3][12 / size];
+        String binaryNumbers[][] = new String[fileLengthY][12 / size];
+        long results[][] = new long[fileLengthY][12 / size];
 
         switch (size) {
             case 1:
-                for (i = 0; i < 3; i++) {
+                for (i = 0; i < fileLengthY; i++) {
                     for (int j = 0; j < 12; j++) {
                         binaryNumbers[i][j] = convertShortToBinary(decArray[i][j]);
                     }
                 }
 
                 if (dataType == 1) {// For unsigned
-                    printShortArray2D(decArray);
+                    
+                    for (i = 0; i < fileLengthY; i++) {
+                        for (int j = 0; j < 12 / size; j++) {
+                            results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
+                        }
+                    }
+
                 } else if (dataType == 0) {// For Signed
 
                 } else {// For float
@@ -109,7 +124,7 @@ class Main {
                 break;
 
             case 2:
-                for (i = 0; i < 3; i++) {
+                for (i = 0; i < fileLengthY; i++) {
                     for (int j = 0; j < 12; j += 2) {
                         // big
                         if (endianType == 0) {
@@ -123,12 +138,14 @@ class Main {
                 }
 
                 if (dataType == 1) {// If it is unsigned
-                    for (i = 0; i < 3; i++) {
+                    for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
                             results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
                         }
                     }
-                } else if (dataType == 0) {
+                } else if (dataType == 0) {//For Signed
+
+                } else {//For Float
 
                 }
                 printStringArray2D(binaryNumbers);
@@ -136,7 +153,7 @@ class Main {
                 break;
 
             case 3:
-                for (i = 0; i < 3; i++) {
+                for (i = 0; i < fileLengthY; i++) {
                     for (int j = 0; j < 12; j += 3) {
 
                         if (endianType == 0) {
@@ -152,7 +169,7 @@ class Main {
                 }
 
                 if (dataType == 1) {// For unsigned
-                    for (i = 0; i < 3; i++) {
+                    for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
                             results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
                         }
@@ -169,7 +186,7 @@ class Main {
                 break;
 
             case 4:
-                for (i = 0; i < 3; i++) {
+                for (i = 0; i < fileLengthY; i++) {
                     for (int j = 0; j < 12; j += 4) {
 
                         if (endianType == 0) {
@@ -188,7 +205,7 @@ class Main {
                 }
 
                 if (dataType == 1) {// For unsigned
-                    for (i = 0; i < 3; i++) {
+                    for (i = 0; i < fileLengthY; i++) {
                         for (int j = 0; j < 12 / size; j++) {
                             results[i][j] = convertBinaryToLong(binaryNumbers[i][j]);
                         }
@@ -298,28 +315,36 @@ class Main {
         }
         return decimalValue;
     }
+
     public static int binaryToSignedInteger(String binary) {
         int result = 0;
-        int mult = (int)(Math.pow(2, binary.length()-1));
-        
+        int mult = (int) (Math.pow(2, binary.length() - 1));
+
         for (int i = 0; i < binary.length(); i++) {
-            if(i == 0){
-                if(binary.charAt(0) == '1'){
+            if (i == 0) {
+                if (binary.charAt(0) == '1') {
                     result = result - mult;
                 }
-            } else{
-                if(binary.charAt(i) == '1'){
-                    result= result + mult;
+            } else {
+                if (binary.charAt(i) == '1') {
+                    result = result + mult;
                 }
             }
 
-            mult = mult/2;
+            mult = mult / 2;
 
-            
-            
         }
-        return result; 
+        return result;
     }
-    
+
+    public static int getFileLengthY(File file) throws IOException {
+        try (BufferedReader br = new BufferedReader(new FileReader(file))) {
+            int lineCount = 0;
+            while (br.readLine() != null) {
+                lineCount++;
+            }
+            return lineCount;
+        }
+    }
 
 }
