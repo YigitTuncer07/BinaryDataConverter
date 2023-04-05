@@ -357,15 +357,20 @@ class Main {
     public static void writeArrayToFile(long[][] array, String filePath) {
         try {
             PrintWriter writer = new PrintWriter(new File(filePath));
-            for (int i = 0; i < array.length; i++) {
-                for (int j = 0; j < array[i].length; j++) {
+            int i = 0;
+            int j = 0;
+            for (i = 0; i < array.length; i++) {
+                for (j = 0; j < array[i].length - 1; j++) {
                     writer.print(array[i][j] + " ");
                 }
+                writer.print(array[i][j++]);
+                j = 0;
                 writer.println();
             }
             writer.close();
         } catch (FileNotFoundException e) {
-            e.printStackTrace();
+            System.out.println("ERROR: OUTPUT FILE NOT FOUND");
+            return;
         }
     }
 
