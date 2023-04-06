@@ -322,11 +322,8 @@ class Main {
                         // System.out.println(doubleParts[1] + " IS ONE");
 
                         if (isZero(doubleParts[2])) {// This means infinity
-                            System.out.println("INFINITY HAS BEEN WRITEN");
                             writer.print("INFINITY");
                         } else {
-                            System.out.println("NAN HAS BEEN WRITEN");
-
                             writer.print("NaN");
                         }
 
@@ -365,7 +362,9 @@ class Main {
                         writer.print(" ");
                     }
                 }
-                writer.println();
+                if (i != fileLengthY - 1){
+                    writer.println();
+                }
             }
             writer.close();
 
@@ -377,6 +376,8 @@ class Main {
     }
 
     public static String roundToEven(String bin) {
+        String partToRound = bin.substring(12,bin.length());
+
         return " ";
     }
 
