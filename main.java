@@ -233,6 +233,9 @@ class Main {
 
                 } else {// For float
                     printBinaryToDoubleToFile(binaryNumbers, 10, fileLengthY);
+                    // String[][] temp = new String[1][1];
+                    // temp[0][0] = "01000000000000011001000011110000";
+                    // printBinaryToDoubleToFile(temp, 10, fileLengthY);
 
                 }
                 printStringArray2D(binaryNumbers);
@@ -291,7 +294,7 @@ class Main {
                     // System.out.println(bias);
 
                     if (doubleParts[2].length() > 13) {
-                        // doubleParts[2] = roundToEven(doubleParts[2]);
+                        doubleParts[2] = roundToEven(doubleParts[2]);
                     }
 
                     if (isZero(doubleParts[1])) {// Checks if it is a denormalized number
@@ -362,23 +365,51 @@ class Main {
                         writer.print(" ");
                     }
                 }
-                if (i != fileLengthY - 1){
+                if (i != fileLengthY - 1) {
                     writer.println();
                 }
             }
             writer.close();
 
         } catch (Exception e) {
-            System.out.println("FILE NOT FOUND");
+            System.out.println("OUTPUT FILE NOT FOUND");
             return;
         }
 
     }
 
     public static String roundToEven(String bin) {
-        String partToRound = bin.substring(12,bin.length());
+        String partToRound = bin.substring(13, bin.length());
+        String result = bin.substring(0, 13);
 
-        return " ";
+        // String tempRes = result;
+        if (partToRound.charAt(0) == '0') {
+            // System.out.println(tempRes + " round down --> " + result);
+            return result;
+        }
+
+        if (isZero(partToRound.substring(1, partToRound.length()))) {
+            // System.out.println(bin + " --> " + partToRound + " it is even");
+            if (result.charAt(result.length() - 1) == '0') {
+                return result;
+            } else {
+                return result.substring(0, result.length() - 1) + "1";
+            }
+        } else {
+            char[] arr = result.toCharArray();
+
+            int lenght = result.length() - 1;
+            boolean quit = false;
+            while (!quit) {
+                if (arr[lenght] == '0') {
+                    arr[lenght] = '1';
+                    quit = true;
+                }
+                lenght--;
+            }
+            // System.out.println(tempRes + " round up --> " + String.valueOf(arr));
+            return String.valueOf(arr);
+        }
     }
 
     public static boolean isNegative(double d) {
