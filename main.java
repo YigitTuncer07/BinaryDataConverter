@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class Main {
+class main {
 
     // big -> 0; little -> 1
     public static byte endianType;
@@ -126,7 +126,7 @@ class Main {
                     printBinaryToDoubleToFile(binaryNumbers, 4, fileLengthY);
 
                 }
-                printStringArray2D(binaryNumbers);
+                
 
                 break;
 
@@ -159,7 +159,7 @@ class Main {
                 } else {// For Float
                     printBinaryToDoubleToFile(binaryNumbers, 6, fileLengthY);
                 }
-                printStringArray2D(binaryNumbers);
+                
                 break;
 
             case 3:
@@ -195,7 +195,7 @@ class Main {
                 } else {// For float
                     printBinaryToDoubleToFile(binaryNumbers, 8, fileLengthY);
                 }
-                printStringArray2D(binaryNumbers);
+                
                 break;
 
             case 4:
@@ -238,7 +238,7 @@ class Main {
                     // printBinaryToDoubleToFile(temp, 10, fileLengthY);
 
                 }
-                printStringArray2D(binaryNumbers);
+                
                 break;
 
         }
@@ -309,28 +309,42 @@ class Main {
                             mantisa *= -1;
                         }
 
+                        result = mantisa * Math.pow(2, exponent);
+                        
+
                         // System.out.println(doubleParts[1] + " exponent = " + exponent + "| " +
                         // doubleParts[2] + " mantisa = " + mantisa);
-                        if ((!(mantisa > 0) && !(mantisa < 0))) {
-                            writer.print(0);
-                        } else if (mantisa == -0.0) {
-                            writer.print(-0);
-                        } else {
-                            result = mantisa * Math.pow(2, exponent);
+                        if(result==0){
+                            if(Double.doubleToRawLongBits(result) == 0){
+                                writer.printf("0");
+                            }else{
+                                writer.printf("-0");
+                            }
+                        
+                        }else if (result < 0.001) { // SCIENCETIF NOTATION
                             writer.printf("%.5e", result);
+                        }else { // DOUBLE
+                            String stringFormat = String.format("%.5f", result);
+                            writer.printf(stringFormat);
+                
                         }
+                        
 
                     } else if (isOne(doubleParts[1])) {// Checks if it is a special number
 
                         // System.out.println(doubleParts[1] + " IS ONE");
 
                         if (isZero(doubleParts[2])) {// This means infinity
-                            writer.print("INFINITY");
+                            if(isZero(doubleParts[0])){
+                                writer.print("∞");
+                            }else{
+                                writer.print("-∞");
+                            }
                         } else {
                             writer.print("NaN");
                         }
 
-                    } else {
+                    } else { // Normalized numbers
 
                         // System.out.println(doubleParts[1] + " IS NORMAL");
 
@@ -348,17 +362,21 @@ class Main {
 
                         // Combine them
 
-                        if ((!(mantisa > 0) && !(mantisa < 0))) {
-                            if (isNegative(mantisa)) {
-                                writer.print("-0");
-                            } else {
-                                writer.print("0");
+                        result = mantisa * Math.pow(2, exponent);
+                        if(result==0){
+                            if(Double.doubleToRawLongBits(result) == 0){
+                                writer.printf("0");
+                            }else{
+                                writer.printf("-0");
                             }
-                        } else {
-                            result = mantisa * Math.pow(2, exponent);
+                        
+                        }else if (result < 0.001) { // SCIENCETIF NOTATION
                             writer.printf("%.5e", result);
+                        }else { // DOUBLE
+                            String stringFormat = String.format("%.5f", result);
+                            writer.printf(stringFormat);
+                
                         }
-
                     }
 
                     if (j != 11) {
