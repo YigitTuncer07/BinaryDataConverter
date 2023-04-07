@@ -6,7 +6,7 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.PrintWriter;
 
-class main {
+class Main {
 
     // big -> 0; little -> 1
     public static byte endianType;
@@ -126,7 +126,6 @@ class main {
                     printBinaryToDoubleToFile(binaryNumbers, 4, fileLengthY);
 
                 }
-                
 
                 break;
 
@@ -159,7 +158,7 @@ class main {
                 } else {// For Float
                     printBinaryToDoubleToFile(binaryNumbers, 6, fileLengthY);
                 }
-                
+
                 break;
 
             case 3:
@@ -195,7 +194,7 @@ class main {
                 } else {// For float
                     printBinaryToDoubleToFile(binaryNumbers, 8, fileLengthY);
                 }
-                
+
                 break;
 
             case 4:
@@ -233,12 +232,9 @@ class main {
 
                 } else {// For float
                     printBinaryToDoubleToFile(binaryNumbers, 10, fileLengthY);
-                    // String[][] temp = new String[1][1];
-                    // temp[0][0] = "01000000000000011001000011110000";
-                    // printBinaryToDoubleToFile(temp, 10, fileLengthY);
 
                 }
-                
+
                 break;
 
         }
@@ -267,132 +263,111 @@ class main {
         return true;
     }
 
-    public static void printBinaryToDoubleToFile(String[][] binaryNumbers, int exp, int fileLengthY) {
+    public static void printBinaryToDoubleToFile(String[][] binaryNumbers, int exp, int fileLengthY)
+            throws FileNotFoundException {
 
-        try {
-            PrintWriter writer = new PrintWriter(new File("output.txt"));
-            int bias, exponent = 0;
-            double mantisa = 0;
-            double result = 0;
+        PrintWriter writer = new PrintWriter(new File("output.txt"));
+        int bias, exponent = 0;
+        double mantisa = 0;
+        double result = 0;
 
-            for (int i = 0; i < fileLengthY; i++) {
-                for (int j = 0; j < 12 / size; j++) {
-                    String IEEE = binaryNumbers[i][j];
-                    String[] doubleParts = new String[3];
+        for (int i = 0; i < fileLengthY; i++) {
+            for (int j = 0; j < 12 / size; j++) {
+                String IEEE = binaryNumbers[i][j];
+                String[] doubleParts = new String[3];
 
-                    // Split the string into parts
-                    doubleParts[0] = IEEE.substring(0, 1);// Sign
-                    doubleParts[1] = IEEE.substring(1, 1 + exp);// Exponent
-                    doubleParts[2] = IEEE.substring(1 + exp, IEEE.length());// Mantissa
+                // Split the string into parts
+                doubleParts[0] = IEEE.substring(0, 1);// Sign
+                doubleParts[1] = IEEE.substring(1, 1 + exp);// Exponent
+                doubleParts[2] = IEEE.substring(1 + exp, IEEE.length());// Mantissa
 
-                    // System.out.println(doubleParts[0] + " " + doubleParts[1] + " " +
-                    // doubleParts[2]);
+                // Set Bias
+                bias = (int) Math.pow(2, exp - 1) - 1;
 
-                    // Set Bias
-                    bias = (int) Math.pow(2, exp - 1) - 1;
+                if (doubleParts[2].length() > 13) {
+                    doubleParts[2] = roundToEven(doubleParts[2]);
+                }
 
-                    // System.out.println(bias);
+                if (isZero(doubleParts[1])) {// Checks if it is a denormalized number
 
-                    if (doubleParts[2].length() > 13) {
-                        doubleParts[2] = roundToEven(doubleParts[2]);
+                    // Set Exponent
+                    exponent = 1 - bias;
+
+                    mantisa = convertBinaryToDouble(doubleParts[2]);
+
+                    if (doubleParts[0].equals("1")) {
+                        mantisa *= -1;
                     }
 
-                    if (isZero(doubleParts[1])) {// Checks if it is a denormalized number
+                    result = mantisa * Math.pow(2, exponent);
 
-                        // System.out.println(doubleParts[1] + " IS ZERO");
-                        // Set Exponent
-                        exponent = 1 - bias;
-
-                        mantisa = convertBinaryToDouble(doubleParts[2]);
-
-                        if (doubleParts[0].equals("1")) {
-                            mantisa *= -1;
-                        }
-
-                        result = mantisa * Math.pow(2, exponent);
-                        
-
-                        // System.out.println(doubleParts[1] + " exponent = " + exponent + "| " +
-                        // doubleParts[2] + " mantisa = " + mantisa);
-                        if(result==0){
-                            if(Double.doubleToRawLongBits(result) == 0){
-                                writer.printf("0");
-                            }else{
-                                writer.printf("-0");
-                            }
-                        
-                        }else if (result < 0.001) { // SCIENCETIF NOTATION
-                            writer.printf("%.5e", result);
-                        }else { // DOUBLE
-                            String stringFormat = String.format("%.5f", result);
-                            writer.printf(stringFormat);
-                
-                        }
-                        
-
-                    } else if (isOne(doubleParts[1])) {// Checks if it is a special number
-
-                        // System.out.println(doubleParts[1] + " IS ONE");
-
-                        if (isZero(doubleParts[2])) {// This means infinity
-                            if(isZero(doubleParts[0])){
-                                writer.print("∞");
-                            }else{
-                                writer.print("-∞");
-                            }
+                    // doubleParts[2] + " mantisa = " + mantisa);
+                    if (result == 0) {
+                        if (Double.doubleToRawLongBits(result) == 0) {
+                            writer.printf("0");
                         } else {
-                            writer.print("NaN");
+                            writer.printf("-0");
                         }
 
-                    } else { // Normalized numbers
+                    } else if (result < 0.001) { // SCIENCETIF NOTATION
+                        writer.printf("%.5e", result);
+                    } else { // DOUBLE
+                        String stringFormat = String.format("%.5f", result);
+                        writer.printf(stringFormat);
 
-                        // System.out.println(doubleParts[1] + " IS NORMAL");
-
-                        exponent = convertBinaryToInteger(doubleParts[1]) - bias;
-
-                        mantisa = convertBinaryToDouble(doubleParts[2]) + 1;
-
-                        // Set Sign
-                        if (doubleParts[0].equals("1")) {
-                            mantisa *= -1;
-                        }
-
-                        // System.out.println(doubleParts[1] + " exponent = " + exponent + "| " +
-                        // doubleParts[2] + " mantisa = " + mantisa);
-
-                        // Combine them
-
-                        result = mantisa * Math.pow(2, exponent);
-                        if(result==0){
-                            if(Double.doubleToRawLongBits(result) == 0){
-                                writer.printf("0");
-                            }else{
-                                writer.printf("-0");
-                            }
-                        
-                        }else if (result < 0.001) { // SCIENCETIF NOTATION
-                            writer.printf("%.5e", result);
-                        }else { // DOUBLE
-                            String stringFormat = String.format("%.5f", result);
-                            writer.printf(stringFormat);
-                
-                        }
                     }
 
-                    if (j != 11) {
-                        writer.print(" ");
+                } else if (isOne(doubleParts[1])) {// Checks if it is a special number
+
+                    if (isZero(doubleParts[2])) {// This means infinity
+                        if (isZero(doubleParts[0])) {
+                            writer.print("∞");
+                        } else {
+                            writer.print("-∞");
+                        }
+                    } else {
+                        writer.print("NaN");
+                    }
+
+                } else { // Normalized numbers
+
+                    exponent = convertBinaryToInteger(doubleParts[1]) - bias;
+
+                    mantisa = convertBinaryToDouble(doubleParts[2]) + 1;
+
+                    // Set Sign
+                    if (doubleParts[0].equals("1")) {
+                        mantisa *= -1;
+                    }
+
+                    // Combine them
+
+                    result = mantisa * Math.pow(2, exponent);
+                    if (result == 0) {
+                        if (Double.doubleToRawLongBits(result) == 0) {
+                            writer.printf("0");
+                        } else {
+                            writer.printf("-0");
+                        }
+
+                    } else if (result < 0.001) { // SCIENCETIF NOTATION
+                        writer.printf("%.5e", result);
+                    } else { // DOUBLE
+                        String stringFormat = String.format("%.5f", result);
+                        writer.printf(stringFormat);
+
                     }
                 }
-                if (i != fileLengthY - 1) {
-                    writer.println();
+
+                if (j != 11) {
+                    writer.print(" ");
                 }
             }
-            writer.close();
-
-        } catch (Exception e) {
-            System.out.println("OUTPUT FILE NOT FOUND");
-            return;
+            if (i != fileLengthY - 1) {
+                writer.println();
+            }
         }
+        writer.close();
 
     }
 
@@ -400,14 +375,14 @@ class main {
         String partToRound = bin.substring(13, bin.length());
         String result = bin.substring(0, 13);
 
-        // String tempRes = result;
-        if (partToRound.charAt(0) == '0') {
-            // System.out.println(tempRes + " round down --> " + result);
+        if (partToRound.charAt(0) == '0') {//If less than even
+            return result;
+        }
+        if (isOne(result)){//Returns it exactly the same if it is all 1s as we cant increment it
             return result;
         }
 
-        if (isZero(partToRound.substring(1, partToRound.length()))) {
-            // System.out.println(bin + " --> " + partToRound + " it is even");
+        if (isZero(partToRound.substring(1, partToRound.length()))) {//If it is exactly even
             if (result.charAt(result.length() - 1) == '0') {
                 return result;
             } else {
@@ -419,13 +394,13 @@ class main {
             int lenght = result.length() - 1;
             boolean quit = false;
             while (!quit) {
+                System.out.println("length: " + lenght);
                 if (arr[lenght] == '0') {
                     arr[lenght] = '1';
                     quit = true;
                 }
                 lenght--;
             }
-            // System.out.println(tempRes + " round up --> " + String.valueOf(arr));
             return String.valueOf(arr);
         }
     }
@@ -525,34 +500,6 @@ class main {
         sum += x * 16;
         return sum;
 
-    }
-
-    // Temp func for testing delete.
-    public static void printShortArray2D(short[][] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public static void printStringArray2D(String[][] array) {
-        for (int i = 0; i < array.length; i++) {
-            for (int j = 0; j < array[i].length; j++) {
-                System.out.print(array[i][j] + " ");
-            }
-            System.out.println();
-        }
-    }
-
-    public static void printLongArray2D(long[][] arr) {
-        for (int i = 0; i < arr.length; i++) {
-            for (int j = 0; j < arr[i].length; j++) {
-                System.out.print(arr[i][j] + " ");
-            }
-            System.out.println();
-        }
     }
 
     public static void writeLongArrayToFile(long[][] array, String filePath) {
