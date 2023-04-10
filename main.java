@@ -309,7 +309,7 @@ class Main {
                             writer.printf("-0");
                         }
 
-                    } else if (result < 0.001) { // SCIENCETIF NOTATION
+                    } else if ((result > -0.001) && (result < 0.001)) { // SCIENCETIF NOTATION
                         writer.printf("%.5e", result);
                     } else { // DOUBLE
                         String stringFormat = String.format("%.5f", result);
@@ -350,7 +350,7 @@ class Main {
                             writer.printf("-0");
                         }
 
-                    } else if (result < 0.001) { // SCIENCETIF NOTATION
+                    } else if ((result > -0.001) && (result < 0.001)) { // SCIENCETIF NOTATION
                         writer.printf("%.5e", result);
                     } else { // DOUBLE
                         String stringFormat = String.format("%.5f", result);
@@ -375,14 +375,14 @@ class Main {
         String partToRound = bin.substring(13, bin.length());
         String result = bin.substring(0, 13);
 
-        if (partToRound.charAt(0) == '0') {//If less than even
+        if (partToRound.charAt(0) == '0') {// If less than even
             return result;
         }
-        if (isOne(result)){//Returns it exactly the same if it is all 1s as we cant increment it
+        if (isOne(result)) {// Returns it exactly the same if it is all 1s as we cant increment it
             return result;
         }
 
-        if (isZero(partToRound.substring(1, partToRound.length()))) {//If it is exactly even
+        if (isZero(partToRound.substring(1, partToRound.length()))) {// If it is exactly even
             if (result.charAt(result.length() - 1) == '0') {
                 return result;
             } else {
@@ -394,7 +394,6 @@ class Main {
             int lenght = result.length() - 1;
             boolean quit = false;
             while (!quit) {
-                System.out.println("length: " + lenght);
                 if (arr[lenght] == '0') {
                     arr[lenght] = '1';
                     quit = true;
@@ -531,5 +530,4 @@ class Main {
             return lineCount;
         }
     }
-//.
 }
